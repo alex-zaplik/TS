@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista 2</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+
+  <style>
+    body {
+        text-align: justify;
+    }
+    .p-img {
+        text-align: center;
+    }
+  </style>
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="technologie-sieciowe---lista-2">Technologie Sieciowe - Lista 2</h1>
+<h2 id="zadanie-1">Zadanie 1</h2>
+<p>Do sprawdzania niezawodności sieci użyjemy metody Monte Carlo. Jedną iteracją będzie budowa grafu o zadanej strukturze, następnie przejście po wszystkich kanałach i wywołanie uszkodzeń zgodnie z odpowiednimi prawdopodobieństwami. Iteracja będzie sukcesem jeżeli sieć pozostanie spójna.</p>
+<p>Bazowy graf będziemy budować prostą pętlą dodającą odpowiednie kanały:</p>
+<pre class=" language-cpp"><code class="prism  language-cpp">std<span class="token operator">::</span>vector<span class="token operator">&lt;</span>EdgeInfo<span class="token operator">&gt;</span> edges<span class="token punctuation">;</span>
+<span class="token keyword">int</span> max <span class="token operator">=</span> <span class="token number">20</span><span class="token punctuation">;</span>
+
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> max<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+	edges<span class="token punctuation">.</span><span class="token function">push_back</span><span class="token punctuation">(</span><span class="token function">EdgeInfo</span><span class="token punctuation">(</span>i<span class="token punctuation">,</span> i <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0.95</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Następnie, jeśli będzie taka potrzeba, dodamy dodatkowe wierzchołki, po czym wywołamy uszkodzenia za pomocą następującej pętli:</p>
+<pre class=" language-cpp"><code class="prism  language-cpp"><span class="token keyword">auto</span> it <span class="token operator">=</span> edges<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">while</span> <span class="token punctuation">(</span>it <span class="token operator">!=</span> edges<span class="token punctuation">.</span><span class="token function">end</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">rand</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">1000</span><span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">1000.0</span> <span class="token operator">&gt;</span> <span class="token punctuation">(</span><span class="token operator">*</span>it<span class="token punctuation">)</span><span class="token punctuation">.</span>h<span class="token punctuation">)</span>
+	<span class="token punctuation">{</span>
+		<span class="token keyword">int</span> index <span class="token operator">=</span> it <span class="token operator">-</span> edges<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		edges<span class="token punctuation">.</span><span class="token function">erase</span><span class="token punctuation">(</span>it<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		it <span class="token operator">=</span> edges<span class="token punctuation">.</span><span class="token function">begin</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> index<span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+	<span class="token keyword">else</span>
+	<span class="token punctuation">{</span>
+		it<span class="token operator">++</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Sprawdzanie spójności odbędzie się poprzez zbudowanie macierzy przejść. Zostanie do wykonane na bazie rekurencyjnego algorytmu znajdowania najkrótszej ścieżki. Jeżeli żadna ścieżka nie zostanie znaleziona, do macierzy zostanie wstawiona wartość <em>-1</em>. Zakładamy, że nie ma ścieżki z każdego wierzchołka do siebie samego, więc jeśli graf będzie spójny w macierzy <em>-1</em> pojawi się dokładnie 20 razy, jeżeli ten warunek nie będzie spełniony to graf nie jest spójny.</p>
+<h3 id="graf-liniowy">Graf liniowy</h3>
+<p class="p-img"><img src="https://lh3.googleusercontent.com/nu7M-lCXyZJ_18erUQ8h9k_wMNOPwJ5Is-GDOhuru9xQr0hkmlCc6aot9bMUHaZymtkyg_Gn7sX8" alt="enter image description here" title="Graf liniowy"></p>
+<p>Pierwszą badaną siecią jest graf liniowy, którego każda krawędź może ulec uszkodzeniu z prawdopodobieństwem 5%. Jest to struktura bardzo delikatna ponieważ uszkodzenie dowolnej krawędzi sprawia, że sieć przestaje być spójna, dlatego też, pomimo dużej niezawodności kanałów, szansa na to, że graf pozostanie spójny to zaledwie <strong>38.6%</strong>.</p>
+<h3 id="graf-kołowy">Graf kołowy</h3>
+<p class="p-img"><img src="https://lh3.googleusercontent.com/b5K9c8brMB2UxyAvaOtoVSgJhPgqgs1R0v2SYca8YnErCG5Jgrj5W8-jHDxnr-QLQIU4vXHFTAKz" alt="enter image description here" title="Graf kołowy"></p>
+<p>Kolejną badaną strukturą będzie ta przedstawiona powyżej wzbogacona o dodatkowy kanał pomiędzy wierzchołkami <em>1</em> oraz <em>20</em> , którego niezawodności również wynosi 95%. W ten sposób powstaje graf kołowy. Struktura ta jest znacznie bardziej wytrzymała, ponieważ uszkodzenie jednego kanału nie wpływa na spójności, zostanie ona utracona dopiero jeśli uszkodzone zostaną co najmniej dwa. Wobec tego można się spodziewać dwukrotnego wzrostu niezawodności, co potwierdza test zwracając wartość <strong>75.3%</strong>.</p>
+<h3 id="graf-kołowy-z-dwoma-dodatkowymi-kanałami">Graf kołowy z dwoma dodatkowymi kanałami</h3>
+<p class="p-img"><img src="https://lh3.googleusercontent.com/CMPxRuwIo497fLr7A-LzDRQ5HiTcKiTRXBgXfg9Sju1iaANCF8_oAI00Dbny0Y10ZKb5GjEB3pYK" alt="enter image description here" title="Graf kołowy z dodatkowymi krawędziami"></p>
+<p>Tym razem, do poprzednio testowanej struktury, dodajemy dwa kanały: jeden między wierzchołkami <em>1</em> i <em>10</em> o niezawodności 80% i drugi między <em>5</em> i <em>15</em> o niezawodności 70%. Zauważmy, że taka struktura jest w stanie zachować spójności nawet jeśli uszkodzeniu ulegną 4 kanały (np.: <em>3-4</em>,  <em>7-8</em>, <em>12-13</em> oraz <em>17-18</em>), nie ma to jednak tak dużego wpływu jak przejście z pierwszej badanej struktury na drugą, ponieważ nie mówimy tu o czterech dowolnych krawędziach, tylko o takich odpowiednio dobranych. Niezawodność takiej sieci test oszacował na <strong>87.8%</strong>.</p>
+<h3 id="graf-kołowy-z-dwoma-dodatkowymi-kanałami-oraz-czterema-losowymi">Graf kołowy z dwoma dodatkowymi kanałami oraz czterema losowymi</h3>
+<p class="p-img"><img src="https://lh3.googleusercontent.com/JpCiIHJY_Spffv2lV7lkXfix7N7SZxixMnky6hXEqDVSNn_oO9s1GDHd4rhvS-tDv0QGnbQUutYA" alt="enter image description here" title="Graf kołowy z dodatkowymi oraz losowymi krawędziami"></p>
+<p>Ostatnią badaną strukturą jest sieć kołowa wzbogacona o dwa kanały opisane powyżej oraz o kolejne cztery losowo wybrane kanały o niezawodności wynoszącej zaledwie 40%. Pomimo, że liczba dodawanych krawędzi jest duża i umożliwia to uszkodzenie większej ilości kanałów bez utraty spójności, nowe elementy struktury bardzo łatwo ulegają uszkodzeniu, więc mają znikomy wpół na całkowitą niezawodności. Test szacują ją na <strong>90.4%</strong>.</p>
+<h2 id="zadanie-2">Zadanie 2</h2>
+</div>
+</body>
+
+</html>
